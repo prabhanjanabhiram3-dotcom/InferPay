@@ -108,6 +108,22 @@ async function main() {
       console.log("Success:", decodedPayment.success);
       console.log("Network:", decodedPayment.network);
       console.log("Transaction:", decodedPayment.transaction);
+      if (decodedPayment?.transaction && data?.inferenceId) {
+  await fetch(
+    `https://inferpay-api.onrender.com/api/inference/${data.inferenceId}/payment`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        transactionId: decodedPayment.transaction,
+        network: decodedPayment.network,
+      }),
+    }
+  );
+}
+
     } catch (error) {
       console.log(
         "\nPayment succeeded but settlement header could not be decoded."
