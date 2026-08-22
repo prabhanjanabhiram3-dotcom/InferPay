@@ -12,8 +12,14 @@ import {
   bazaarResourceServerExtension,
   declareDiscoveryExtension,
 } from "@x402/extensions";
+import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SECRET_KEY!
+);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -433,8 +439,38 @@ app.get('/api/models', async (_req, res) => {
   }
 });
 
-app.get('/api/stats', (_req, res) => {
-  const history = readHistory();
+app.get('/api/stats', async (_req, res) => {
+  const { data: rows, error } = await supabase
+    .from('inference_history')
+    .select('*')
+    .order('timestamp', { ascending: false });
+
+  if (error) {
+    console.error('Supabase stats read error:', error);
+
+    return res.status(500).json({
+      error: 'Failed to load stats data',
+    });
+  }
+
+  const history = (rows || []).map((item: any) => ({
+    id: item.id,
+    timestamp: item.timestamp,
+    taskType: item.task_type,
+    complexity: item.complexity,
+    routerTier: item.router_tier,
+    preferredModel: item.preferred_model,
+    actualModel: item.actual_model,
+    fallbackUsed: item.fallback_used,
+    inputTokens: item.input_tokens,
+    outputTokens: item.output_tokens,
+    totalTokens: item.total_tokens,
+    cost: Number(item.cost || 0),
+    status: item.status,
+    paymentStatus: item.payment_status,
+    transactionId: item.transaction_id,
+    paymentNetwork: item.payment_network,
+  }));
 
   const totalRequests = history.length;
   const totalSpent = history.reduce(
@@ -463,8 +499,38 @@ app.get('/api/stats', (_req, res) => {
   });
 });
 
-app.get('/api/usage', (_req, res) => {
-  const history = readHistory();
+app.get('/api/usage', async (_req, res) => {
+  const { data: rows, error } = await supabase
+    .from('inference_history')
+    .select('*')
+    .order('timestamp', { ascending: false });
+
+  if (error) {
+    console.error('Supabase usage read error:', error);
+
+    return res.status(500).json({
+      error: 'Failed to load usage data',
+    });
+  }
+
+  const history = (rows || []).map((item: any) => ({
+    id: item.id,
+    timestamp: item.timestamp,
+    taskType: item.task_type,
+    complexity: item.complexity,
+    routerTier: item.router_tier,
+    preferredModel: item.preferred_model,
+    actualModel: item.actual_model,
+    fallbackUsed: item.fallback_used,
+    inputTokens: item.input_tokens,
+    outputTokens: item.output_tokens,
+    totalTokens: item.total_tokens,
+    cost: Number(item.cost || 0),
+    status: item.status,
+    paymentStatus: item.payment_status,
+    transactionId: item.transaction_id,
+    paymentNetwork: item.payment_network,
+  }));
 
   const totalRequests = history.length;
   const totalSpend = history.reduce(
@@ -703,7 +769,7 @@ const cost = pricing
 
 const inferenceId = `inf_${Date.now()}`;
 
-history.unshift({
+const historyRecord = {
   id: inferenceId,
   timestamp: new Date().toISOString(),
   taskType: routing.taskType,
@@ -718,7 +784,31 @@ history.unshift({
   totalTokens,
   cost,
   status: 'Complete',
-});
+};
+
+history.unshift(historyRecord);
+
+const { error: supabaseError } = await supabase
+  .from('inference_history')
+  .insert({
+    id: historyRecord.id,
+    timestamp: historyRecord.timestamp,
+    task_type: historyRecord.taskType,
+    complexity: historyRecord.complexity,
+    router_tier: historyRecord.routerTier,
+    preferred_model: historyRecord.preferredModel,
+    actual_model: historyRecord.actualModel,
+    fallback_used: historyRecord.fallbackUsed,
+    input_tokens: historyRecord.inputTokens,
+    output_tokens: historyRecord.outputTokens,
+    total_tokens: historyRecord.totalTokens,
+    cost: historyRecord.cost,
+    status: historyRecord.status,
+  });
+
+if (supabaseError) {
+  console.error('Supabase inference save error:', supabaseError);
+}
 
 saveHistory(history.slice(0, 500));
 
@@ -770,7 +860,7 @@ app.get("/api/paid-test", (_req, res) => {
   });
 });
 
-app.post('/api/inference/:id/payment', (req, res) => {
+app.post('/api/inference/:id/payment', async (req, res) => {
   const { id } = req.params;
   const { transactionId, network } = req.body;
 
@@ -798,6 +888,19 @@ app.post('/api/inference/:id/payment', (req, res) => {
   };
 
   saveHistory(history.slice(0, 500));
+
+  const { error: paymentUpdateError } = await supabase
+  .from('inference_history')
+  .update({
+    payment_status: 'Settled',
+    transaction_id: transactionId,
+    payment_network: network ?? 'Algorand TestNet',
+  })
+  .eq('id', id);
+
+if (paymentUpdateError) {
+  console.error('Supabase payment update error:', paymentUpdateError);
+}
 
   return res.json({
     success: true,
