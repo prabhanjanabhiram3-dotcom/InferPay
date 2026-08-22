@@ -740,6 +740,69 @@ app.post('/api/inference/:id/payment', (req, res) => {
   });
 });
 
+app.get('/.well-known/x402', (_req, res) => {
+  res.json({
+    name: 'InferPay',
+    description:
+      'Pay-per-use intelligent LLM routing with x402 payments settled on Algorand TestNet.',
+    x402Version: 2,
+    resource: 'https://inferpay-api.onrender.com/api/inference',
+    method: 'POST',
+    network: ALGORAND_TESTNET_CAIP2,
+    scheme: 'exact',
+    price: '$0.01',
+    asset: 'USDC',
+    input: {
+      type: 'json',
+      example: {
+        prompt: 'Explain x402 in simple terms.',
+        priority: 'balanced',
+        budget: 0.01,
+      },
+    },
+    output: {
+      type: 'json',
+      example: {
+        text: '...',
+        model: 'gemini-3.5-flash-lite',
+        cost: 0.0001,
+        routing: {
+          taskType: 'Reasoning',
+          complexity: 'Low',
+        },
+      },
+    },
+  });
+});
+
+app.get('/llms.txt', (_req, res) => {
+  res.type('text/plain').send(
+`# InferPay
+
+InferPay is a pay-per-use AI inference router powered by x402 on Algorand TestNet.
+
+Endpoint:
+POST https://inferpay-api.onrender.com/api/inference
+
+Payment:
+- Protocol: x402
+- Network: Algorand TestNet
+- Asset: USDC
+- Price: $0.01 per request
+- Facilitator: GoPlausible
+
+Example request:
+{
+  "prompt": "Explain x402 in simple terms.",
+  "priority": "balanced",
+  "budget": 0.01
+}
+
+InferPay analyzes each request, selects an appropriate LLM routing tier, processes the x402 payment, and returns the model response with usage and routing metadata.
+`
+  );
+});
+
 app.listen(PORT, () => {
   console.log(`InferPay backend running on http://localhost:${PORT}`);
 });
