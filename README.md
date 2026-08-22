@@ -40,6 +40,11 @@ Model runs the inference
         ↓
 Response is returned
 ```
+## Architecture
+
+InferPay combines intelligent LLM routing with x402 payments on Algorand TestNet.
+
+![InferPay Architecture](docs/images/inferpay-architecture.png)
 
 ## What InferPay does
 
@@ -114,7 +119,7 @@ InferPay uses a real x402 payment flow on Algorand TestNet through the GoPlausib
 
 One of our successful x402 transactions can be verified on Lora
 
-https://lora.algokit.io/testnet/transaction/TNJQU2FA4SJ4E4I3GC5IODKY5HUSOOCG2VFKU6FGM45VYE4EZLRA
+https://lora.algokit.io/testnet/transaction/2JTSD7RLIU3IG5IXBKZP6YWDMC25U5CZKJF2ATTJQV2GT5QZYTUQ
 
 The transaction was created from a paid inference request through InferPay.
 
