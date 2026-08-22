@@ -804,9 +804,6 @@ InferPay analyzes each request, selects an appropriate LLM routing tier, process
 });
 
 app.listen(PORT, () => {
-  console.log(`InferPay backend running on http://localhost:${PORT}`);
-});
-
-app.listen(PORT, () => {
   console.log(`InferPay backend running on port ${PORT}`);
 });
+
