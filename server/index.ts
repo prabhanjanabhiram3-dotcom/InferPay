@@ -8,6 +8,10 @@ import { paymentMiddleware, x402ResourceServer } from "@x402/express";
 import { ExactAvmScheme } from "@x402/avm/exact/server";
 import { HTTPFacilitatorClient } from "@x402/core/server";
 import { ALGORAND_TESTNET_CAIP2 } from "@x402/avm";
+import {
+  bazaarResourceServerExtension,
+  declareDiscoveryExtension,
+} from "@x402/extensions";
 
 dotenv.config();
 
@@ -69,7 +73,57 @@ const facilitatorClient = new HTTPFacilitatorClient({
 });
 
 const resourceServer = new x402ResourceServer(facilitatorClient)
-  .register("algorand:*", new ExactAvmScheme());
+  .register("algorand:*", new ExactAvmScheme())
+  .registerExtension(bazaarResourceServerExtension);
+
+const inferenceDiscovery = declareDiscoveryExtension({
+  bodyType: "json",
+
+  input: {
+    prompt: "Explain x402 in simple terms.",
+    priority: "balanced",
+    budget: 0.01,
+  },
+
+  inputSchema: {
+    properties: {
+      prompt: {
+        type: "string",
+        description: "Prompt to send through the InferPay LLM router",
+      },
+
+      priority: {
+        type: "string",
+        enum: ["cost", "balanced", "quality"],
+        description: "Routing preference",
+      },
+
+      budget: {
+        type: "number",
+        description: "Maximum preferred inference budget in USD",
+      },
+    },
+
+    required: ["prompt"],
+  },
+
+  output: {
+    example: {
+      text: "x402 is a payment protocol for HTTP resources.",
+      model: "gemini-3.5-flash-lite",
+      cost: 0.0001,
+
+      routing: {
+        taskType: "Reasoning",
+        complexity: "Low",
+        selectedProvider: {
+          name: "InferLite",
+          actualModel: "gemini-3.5-flash-lite",
+        },
+      },
+    },
+  },
+});
 
 const x402Routes = {
   "GET /api/paid-test": {
@@ -83,14 +137,22 @@ const x402Routes = {
   },
 
   "POST /api/inference": {
-    accepts: {
-      scheme: "exact",
-      network: ALGORAND_TESTNET_CAIP2,
-      payTo: PAY_TO,
-      price: "$0.01",
-    },
-    description: "InferPay pay-per-use AI inference",
+  accepts: {
+    scheme: "exact",
+    network: ALGORAND_TESTNET_CAIP2,
+    payTo: PAY_TO,
+    price: "$0.01",
   },
+
+  description:
+    "InferPay intelligently routes AI prompts based on complexity, quality, latency, and budget, with x402 payments settled on Algorand.",
+
+  mimeType: "application/json",
+
+  extensions: {
+    ...inferenceDiscovery,
+  },
+},
 } as const;
 app.use(
   paymentMiddleware(
