@@ -108,6 +108,27 @@ and
 ```text
 https://inferpay-api.onrender.com/llms.txt
 ```
+## Transaction proof
+
+InferPay uses a real x402 payment flow on Algorand TestNet through the GoPlausible facilitator.
+
+One of our successful x402 transactions can be verified on Lora
+
+https://lora.algokit.io/testnet/transaction/TNJQU2FA4SJ4E4I3GC5IODKY5HUSOOCG2VFKU6FGM45VYE4EZLRA
+
+The transaction was created from a paid inference request through InferPay.
+
+## What makes InferPay different
+
+InferPay is not just a paid wrapper around one AI model.
+
+The main idea is to combine LLM routing and x402 payments. Before inference, the router checks the task type, complexity, token estimate, budget and user priority to select a suitable model tier.
+
+This means the user does not have to manually decide which model to use or maintain separate payment systems for different AI services.
+
+x402 also makes the inference endpoint directly payable and discoverable by other applications and AI agents.
+
+In the future the same system can be extended from LLMs to MCP tools.
 
 ## Tech used
 
