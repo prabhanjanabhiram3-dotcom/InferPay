@@ -1,63 +1,85 @@
 
 # InferPay
 
-InferPay is a pay per use LLM inference router built using x402 and Algorand.
+InferPay is a pay per request LLM inference service built using x402 and Algorand.
 
-The idea is simple. A user sends a prompt and InferPay checks the task, complexity, budget and priority. It then selects a suitable model and the user pays only for that inference using x402.
+It allows AI agents and applications to access LLM inference without managing subscriptions, credits or separate billing systems. An agent sends a request to InferPay, receives HTTP 402, automatically completes the x402 payment and receives the routed LLM response.
 
-Payments are made using USDC on Algorand TestNet through Pera Wallet.
+InferPay also provides a web interface where users can test the service and monitor routing, payments, transactions and usage.
 
 ## Why InferPay
 
-Using different AI models usually means different API keys, accounts, credits and subscriptions.
+AI agents increasingly need to use external services such as LLM inference.
 
-InferPay tries to make this simpler.
+Traditional APIs usually require accounts, API keys, prepaid credits or subscriptions. This creates friction when an autonomous agent simply needs to use a service once.
 
-The user sends a prompt, the router selects a model and x402 handles the payment before the inference is completed.
+InferPay makes inference directly payable per request.
 
-There is no subscription. Payment happens per request.
+An agent can request inference, handle the x402 payment and receive the result without creating an InferPay account or maintaining a subscription.
 
 ## How it works
 
 ```text
-User enters prompt
+AI Agent / Application
+        ↓
+Discovers InferPay
+        ↓
+POST /api/inference
         ↓
 InferPay analyzes the request
         ↓
 Router selects a suitable model
         ↓
-API returns HTTP 402
+HTTP 402 Payment Required
         ↓
-Pera Wallet opens
+x402 client signs the payment
         ↓
-User approves USDC payment
+GoPlausible verifies and settles it
         ↓
-GoPlausible verifies the payment
+USDC settles on Algorand TestNet
         ↓
-Payment settles on Algorand
+Selected LLM runs inference
         ↓
-Model runs the inference
-        ↓
-Response is returned
+Response is returned to the agent
 ```
+
+InferPay also includes a web interface using Pera Wallet for manually testing the same x402 inference service.
+
 ## Architecture
 
-InferPay combines intelligent LLM routing with x402 payments on Algorand TestNet.
+InferPay combines machine to machine x402 payments, intelligent LLM routing and Algorand settlement in one inference API.
 
 ![InferPay Architecture](docs/images/inferpay-architecture.png)
 
+## Agent to Agent Demo
+
+InferPay can also be used directly by an automated client without opening the web UI.
+
+Run:
+
+```bash
+npm run agent-demo -- "Explain x402 in one sentence"
+```
+
+The agent receives HTTP 402, signs the x402 payment using its TestNet wallet, settles through GoPlausible on Algorand TestNet and receives the routed LLM response automatically.
+
+This demonstrates the machine to machine use case of x402 while the web interface acts as a dashboard to monitor routing, usage and payments.
+
 ## What InferPay does
 
+- Provides a paid inference API for AI agents and applications
 - Routes prompts based on task and complexity
-- Considers budget and user priority
+- Considers budget and priority
 - Uses real LLM responses
-- Uses x402 for pay per request payments
-- Supports Pera Wallet
+- Uses x402 for machine to machine pay per request payments
+- Supports automatic agent payments
+- Supports Pera Wallet for the web demo
 - Settles USDC payments on Algorand TestNet
+- Uses the GoPlausible facilitator
 - Stores inference and payment history
 - Shows token usage and cost
 - Stores the Algorand transaction ID
-- Lets users verify transactions in Lora
+- Lets transactions be verified in Lora
 - Supports x402 Bazaar discovery
 
 ## x402 inference endpoint
@@ -90,7 +112,9 @@ If there is no payment the API returns
 402 Payment Required
 ```
 
-The x402 client then creates the payment and asks the user to approve it through Pera Wallet.
+The x402 client handles the payment and retries the protected request with payment proof.
+
+Automated clients can sign the payment directly using their own wallet. The InferPay web demo also supports manual approval through Pera Wallet.
 
 After the payment is verified the inference runs and the response is returned.
 
@@ -125,15 +149,17 @@ The transaction was created from a paid inference request through InferPay.
 
 ## What makes InferPay different
 
-InferPay is not just a paid wrapper around one AI model.
+InferPay combines intelligent LLM routing with machine to machine payments.
 
-The main idea is to combine LLM routing and x402 payments. Before inference, the router checks the task type, complexity, token estimate, budget and user priority to select a suitable model tier.
+Instead of requiring an AI agent to maintain an InferPay subscription or prepaid account, inference is exposed as an x402 protected resource that can be paid for when needed.
 
-This means the user does not have to manually decide which model to use or maintain separate payment systems for different AI services.
+Before inference, the router analyzes the task type, complexity, token estimate, budget and priority to select a suitable model tier.
 
-x402 also makes the inference endpoint directly payable and discoverable by other applications and AI agents.
+This gives agents a single payable inference endpoint while InferPay handles routing behind the service.
 
-In the future the same system can be extended from LLMs to MCP tools.
+The same API can also be discovered by other applications and AI agents through x402 discovery metadata.
+
+In the future the same approach can be extended from LLM inference to MCP tools and other paid machine services.
 
 ## Tech used
 
@@ -215,31 +241,39 @@ npm run dev
 
 ## Demo flow
 
+### Machine to machine
+
 ```text
-Connect Pera Wallet
+Run InferPay agent client
         ↓
-Enter a prompt
+Agent requests inference
         ↓
-InferPay analyzes it
+HTTP 402 Payment Required
         ↓
-Submit inference
+Agent automatically signs x402 payment
         ↓
-Approve the x402 payment
+GoPlausible verifies the payment
         ↓
-Receive the AI response
+Payment settles on Algorand TestNet
         ↓
-Open Transactions
+InferPay routes the request
         ↓
-View the Algorand transaction in Lora
+Agent receives the LLM response
 ```
+
+### Web demo
+
+The web interface also allows a user to connect Pera Wallet, submit an inference request, approve the x402 payment and inspect the resulting transaction and usage data.
 
 ## Current status
 
 InferPay currently works on Algorand TestNet.
 
-The complete flow from HTTP 402 to wallet approval, payment settlement and AI response is working.
+The machine to machine flow from HTTP 402 to automatic x402 payment, settlement and AI response is working.
 
-The inference API is publicly deployed and is also discoverable through the x402 Bazaar system.
+A separate web interface using Pera Wallet is also available for manually testing and monitoring the inference service.
+
+The inference API is publicly deployed and discoverable through the x402 Bazaar system.
 
 ## Next step
 
