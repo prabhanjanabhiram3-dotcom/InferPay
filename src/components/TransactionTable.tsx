@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { ChevronDown, ArrowUpDown, Network, Coins } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { cn, formatCurrency} from '@/lib/utils';
+import { API_BASE_URL } from '@/lib/api';
 
 interface InferenceRecord {
   id: string;
@@ -30,7 +31,7 @@ export function TransactionTable() {
   useEffect(() => {
   const loadRecords = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/usage');
+      const response = await fetch(`${API_BASE_URL}/api/usage`);
 
       if (!response.ok) {
         throw new Error('Failed to load inference records');

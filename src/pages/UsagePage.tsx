@@ -3,7 +3,7 @@ import { StatCard } from '@/components/StatCard';
 import { ChartCard, BarChart, LineChart, DonutChart} from '@/components/UsageChart';
 import { formatCurrency, formatNumber } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-
+import { API_BASE_URL } from '@/lib/api';
 
 interface UsageData {
   totalRequests: number;
@@ -81,7 +81,7 @@ costPerInference: [
 useEffect(() => {
   const loadUsage = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/usage');
+      const response = await fetch(`${API_BASE_URL}/api/usage`);
 
       if (!response.ok) {
         throw new Error('Failed to load usage data');

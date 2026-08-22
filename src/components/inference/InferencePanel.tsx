@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { useWallet } from "@txnlab/use-wallet-react";
 import { x402Client, wrapFetchWithPayment } from "@x402/fetch";
 import { ExactAvmScheme } from "@x402/avm/exact/client";
+import { API_BASE_URL } from '@/lib/api';
 
 
 const MAX_CHARS = 4000;
@@ -117,7 +118,7 @@ client.register(
 const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
 const apiResponse = await fetchWithPayment(
-  'http://localhost:3001/api/inference',
+  `${API_BASE_URL}/api/inference`,
   {
     method: 'POST',
     headers: {
@@ -159,7 +160,7 @@ if (paymentResponseHeader) {
 if (data.inferenceId && paymentTransaction) {
   try {
     await fetch(
-      `http://localhost:3001/api/inference/${data.inferenceId}/payment`,
+      `${API_BASE_URL}/api/inference/${data.inferenceId}/payment`,
       {
         method: "POST",
         headers: {

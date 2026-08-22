@@ -23,6 +23,7 @@ import { useWallet } from "@txnlab/use-wallet-react";
 import { x402Client, wrapFetchWithPayment } from "@x402/fetch";
 import { ExactAvmScheme } from "@x402/avm/exact/client";
 import type { ClientAvmSigner } from "@x402/avm";
+import { API_BASE_URL } from '@/lib/api';
 
 
 interface HeaderProps {
@@ -137,11 +138,11 @@ client.register(
 
 const fetchWithPayment = wrapFetchWithPayment(fetch, client);
     const response = await fetchWithPayment(
-      "http://localhost:3001/api/paid-test",
-      {
-        method: "GET",
-      },
-    );
+  `${API_BASE_URL}/api/paid-test`,
+  {
+    method: "GET",
+  },
+);
 
     const data = await response.json();
 
