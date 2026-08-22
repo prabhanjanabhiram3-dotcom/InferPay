@@ -12,7 +12,7 @@ import { ALGORAND_TESTNET_CAIP2 } from "@x402/avm";
 dotenv.config();
 
 const app = express();
-const PORT = 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 
 
@@ -744,6 +744,6 @@ app.listen(PORT, () => {
   console.log(`InferPay backend running on http://localhost:${PORT}`);
 });
 
-app.listen(3001, () => {
-  console.log("InferPay backend running on http://localhost:3001");
+app.listen(PORT, () => {
+  console.log(`InferPay backend running on port ${PORT}`);
 });
