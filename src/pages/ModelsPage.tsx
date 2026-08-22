@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Filter, Search, SlidersHorizontal } from 'lucide-react';
 import type { Capability } from '@/types';
-import { models } from '@/data/mockData';
+// ModelsPage.tsx
+import { models } from '@/data/routerConfig';
 import { ModelCard } from '@/components/ModelCard';
 import { Badge } from '@/components/ui/Badge';
 import { capabilityLabel, cn } from '@/lib/utils';

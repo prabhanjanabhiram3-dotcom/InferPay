@@ -7,7 +7,7 @@ import {
   defaultRouterAnalysis,
   pipelineStages as defaultStages,
   priorityLabels,
-} from '@/data/mockData';
+} from '@/data/routerConfig';
 import { RouterAnalysis as RouterAnalysisPanel } from '@/components/inference/RouterAnalysis';
 import { ProviderComparison as ProviderComparisonPanel } from '@/components/inference/ProviderComparison';
 import { PaymentPipeline } from '@/components/inference/PaymentPipeline';

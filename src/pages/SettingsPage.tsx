@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Save, Wallet, KeyRound, Network, Gauge, Boxes, Info } from 'lucide-react';
 import type { Priority } from '@/types';
-import { priorityLabels } from '@/data/mockData';
+// SettingsPage.tsx
+import { priorityLabels } from '@/data/routerConfig';
 import { Card } from '@/components/ui/Card';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Badge } from '@/components/ui/Badge';

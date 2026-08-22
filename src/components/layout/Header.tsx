@@ -53,7 +53,7 @@ const notifications: NotificationItem[] = [
   {
     id: 'n2',
     title: 'x402 payment verified',
-    body: 'Transaction x402_9f2a settled on Algorand TestNet for $0.0084.',
+    body: 'A recent x402 transaction was settled successfully on Algorand TestNet.',
     time: '14m ago',
     unread: true,
     kind: 'success',
