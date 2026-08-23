@@ -3,15 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- "scripts": {
-  "dev": "vite",
-  "server": "tsx server/index.ts",
-  "agent-demo": "tsx scripts/agent-demo.ts",
-  "build": "vite build",
-  "lint": "eslint .",
-  "preview": "vite preview",
-  "typecheck": "tsc --noEmit -p tsconfig.app.json"
-},
+  "scripts": {
+    "dev": "vite",
+    "server": "tsx server/index.ts",
+    "agent-demo": "tsx scripts/agent-demo.ts",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+  },
   "dependencies": {
     "@google/genai": "^2.17.1",
     "@supabase/supabase-js": "^2.57.4",

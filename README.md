@@ -137,15 +137,15 @@ and
 ```text
 https://inferpay-api.onrender.com/llms.txt
 ```
-## Transaction proof
+## Algorand TestNet Transaction Proof
 
-InferPay uses a real x402 payment flow on Algorand TestNet through the GoPlausible facilitator.
+InferPay does not deploy a custom smart contract. The x402 payment is settled on Algorand TestNet through the GoPlausible facilitator.
 
-One of our successful x402 transactions can be verified on Lora
+Successful x402 transaction:
 
-https://lora.algokit.io/testnet/transaction/2JTSD7RLIU3IG5IXBKZP6YWDMC25U5CZKJF2ATTJQV2GT5QZYTUQ
+**Transaction ID:** `2JTSD7RLIU3IG5IXBKZP6YWDMC25U5CZKJF2ATTJQV2GT5QZYTUQ`
 
-The transaction was created from a paid inference request through InferPay.
+**Lora:** [View transaction on Algorand TestNet](https://lora.algokit.io/testnet/transaction/2JTSD7RLIU3IG5IXBKZP6YWDMC25U5CZKJF2ATTJQV2GT5QZYTUQ)
 
 ## What makes InferPay different
 
@@ -274,6 +274,14 @@ The machine to machine flow from HTTP 402 to automatic x402 payment, settlement 
 A separate web interface using Pera Wallet is also available for manually testing and monitoring the inference service.
 
 The inference API is publicly deployed and discoverable through the x402 Bazaar system.
+
+## Team
+
+InferPay was built for the x402 Global Challenge – Bengaluru PreHack by:
+
+- **Prabhanjan**
+- **Pranava G Krishna**
+- **Rathan U C**
 
 ## Next step
 

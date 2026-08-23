@@ -18,9 +18,17 @@ import { useWallet } from "@txnlab/use-wallet-react";
 import { x402Client, wrapFetchWithPayment } from "@x402/fetch";
 import { ExactAvmScheme } from "@x402/avm/exact/client";
 import { API_BASE_URL } from '@/lib/api';
+import algosdk from "algosdk";
 
 
 const MAX_CHARS = 4000;
+const USDC_ASSET_ID = 10458941;
+
+const algod = new algosdk.Algodv2(
+  "",
+  "https://testnet-api.algonode.cloud",
+  ""
+);
 
 export function InferencePanel() {
   const [prompt, setPrompt] = useState('');
@@ -33,6 +41,82 @@ export function InferencePanel() {
   const [running, setRunning] = useState(false);
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
   const { activeAccount, signTransactions } = useWallet();
+  const [isUsdcOptedIn, setIsUsdcOptedIn] = useState<boolean | null>(null);
+  const [optingIn, setOptingIn] = useState(false);
+
+  const checkUsdcOptIn = async () => {
+  if (!activeAccount) {
+    setIsUsdcOptedIn(null);
+    return;
+  }
+
+  try {
+    const accountInfo = await algod
+      .accountInformation(activeAccount.address)
+      .do();
+
+    const optedIn = accountInfo.assets?.some(
+      (asset: any) => Number(asset.assetId) === USDC_ASSET_ID
+    );
+
+    setIsUsdcOptedIn(Boolean(optedIn));
+  } catch (error) {
+    console.error("Failed to check USDC opt-in:", error);
+    setIsUsdcOptedIn(null);
+  }
+};
+
+  useEffect(() => {
+  checkUsdcOptIn();
+}, [activeAccount?.address]);
+
+  const handleUsdcOptIn = async () => {
+  if (!activeAccount || optingIn) return;
+
+  try {
+    setOptingIn(true);
+
+    const suggestedParams = await algod.getTransactionParams().do();
+
+    const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+      sender: activeAccount.address,
+      receiver: activeAccount.address,
+      amount: 0,
+      assetIndex: USDC_ASSET_ID,
+      suggestedParams,
+    });
+
+    const signed = await signTransactions(
+      [txn.toByte()],
+      [0]
+    );
+
+    const signedTxn = signed[0];
+
+    if (!signedTxn) {
+      throw new Error("Opt-in transaction was not signed");
+    }
+
+    const result = await algod
+      .sendRawTransaction(signedTxn)
+      .do();
+
+    await algosdk.waitForConfirmation(
+      algod,
+      result.txid,
+      4
+    );
+
+    await checkUsdcOptIn();
+
+    alert("USDC opt-in successful.");
+  } catch (error) {
+    console.error("USDC opt-in failed:", error);
+    alert("USDC opt-in failed. Check the wallet or console.");
+  } finally {
+    setOptingIn(false);
+  }
+};
 
   useEffect(() => {
     if (!prompt.trim()) {
@@ -92,6 +176,12 @@ export function InferencePanel() {
 
     if (!activeAccount) {
   alert("Connect your Pera wallet first.");
+  setRunning(false);
+  return;
+}
+
+if (isUsdcOptedIn === false) {
+  alert("Please opt in to USDC before making a payment.");
   setRunning(false);
   return;
 }
@@ -343,6 +433,22 @@ if (data.routing?.selectedProvider) {
         </div>
 
         <div className="mt-4 flex items-center gap-2.5">
+          {activeAccount && isUsdcOptedIn === false && (
+  <button
+    type="button"
+    onClick={handleUsdcOptIn}
+    disabled={optingIn}
+    className="h-10 whitespace-nowrap rounded-lg border border-cyan-500 px-4 text-sm font-medium text-cyan-400 transition hover:bg-cyan-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    {optingIn ? "Opting in to USDC..." : "Opt in to USDC"}
+  </button>
+)}
+
+{activeAccount && isUsdcOptedIn === true && (
+  <div className="text-sm text-emerald-400">
+    ✓ USDC enabled on this wallet
+  </div>
+)}
           <button
             onClick={runInference}
             disabled={!prompt.trim() || running}
@@ -356,8 +462,8 @@ if (data.routing?.selectedProvider) {
             Clear
           </button>
           <span className="ml-auto text-[11px] text-ink-500">
-            Real LLM inference is enabled. x402 payment is still in demo mode.
-          </span>
+  Live x402 payments on Algorand TestNet.
+</span>
         </div>
       </div>
 
