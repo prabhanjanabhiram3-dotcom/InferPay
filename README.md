@@ -209,7 +209,7 @@ GitHub
 Clone the project
 
 ```bash
-git clone https://github.com/prabhanjanabhiram3-dotcom/InferPay.git
+git clone https://github.com/PrabhanjanAbhiramR/InferPay.git
 cd InferPay
 ```
 
@@ -275,13 +275,6 @@ A separate web interface using Pera Wallet is also available for manually testin
 
 The inference API is publicly deployed and discoverable through the x402 Bazaar system.
 
-## Team
-
-InferPay was built for the x402 Global Challenge – Bengaluru PreHack by:
-
-- **Prabhanjan**
-- **Pranava G Krishna**
-- **Rathan U C**
 
 ## Next step
 
